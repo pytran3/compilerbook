@@ -16,6 +16,10 @@ typedef enum {
   ND_SUB, // -
   ND_MUL, // *
   ND_DIV, // /
+  ND_EQ,  // ==
+  ND_NE,  // !=
+  ND_LT,  // <
+  ND_LE,  // <=
   ND_NUM, // 整数
 } NodeKind;
 
@@ -28,6 +32,7 @@ struct Token {
   Token *next;    // 次の入力トークン
   int val;        // kindがTK_NUMの場合、その数値
   char *str;      // トークン文字列
+  int len;
 };
 
 
@@ -62,15 +67,22 @@ void error_at(char *loc, char *fmt, ...) {
   fprintf(stderr, "\n");
   exit(1);
 }
-bool consume(char op) {
-  if (token->kind != TK_RESERVED || token->str[0] != op)
+
+bool is_expect(char *op) {
+  return !(token->kind != TK_RESERVED ||
+      strlen(op) != token->len|| 
+      memcmp(token->str, op, token->len));
+}
+
+bool consume(char *op) {
+  if (!is_expect(op))
     return false;
   token = token->next;
   return true;
 }
 
-void expect(char op) {
-  if (token->kind != TK_RESERVED || token->str[0] != op)
+void expect(char *op) {
+  if (!is_expect(op))
     error_at(token->str, "'%c'ではありません", op);
   token = token->next;
 }
@@ -89,12 +101,17 @@ bool at_eof() {
 
 
 
-Token *new_token(TokenKind kind, Token *cur, char *str) {
+Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;
   tok->str = str;
+  tok->len = len;
   cur->next = tok;
   return tok;
+}
+
+bool startswith(char *p, char *q) {
+  return memcmp(p, q, strlen(q)) == 0;
 }
 
 Token *tokenize() {
@@ -110,12 +127,12 @@ Token *tokenize() {
     }
 
     if (strchr("+-*/()", *p)) {
-      cur = new_token(TK_RESERVED, cur, p++);
+      cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
 
     if (isdigit(*p)) {
-      cur = new_token(TK_NUM, cur, p);
+      cur = new_token(TK_NUM, cur, p, 0);
       cur->val = strtol(p, &p, 10);
       continue;
     }
@@ -123,26 +140,34 @@ Token *tokenize() {
     error_at(p, "トークナイズできません");
   }
 
-  new_token(TK_EOF, cur, p);
+  new_token(TK_EOF, cur, p, 0);
   return head.next;
 }
 
-Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
+Node *new_node(NodeKind kind) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
+  return node;
+}
+
+Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
+  Node *node = new_node(kind);
   node->lhs = lhs;
   node->rhs = rhs;
   return node;
 }
 
-Node *new_node_num(int val) {
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = ND_NUM;
+Node *new_num(int val) {
+  Node *node = new_node(ND_NUM);
   node->val = val;
   return node;
 }
 
+
 Node *expr();
+Node *equality();
+Node *relational();
+Node *add();
 Node *mul();
 Node *primary();
 Node *unary();
@@ -152,40 +177,40 @@ Node *expr() {
   Node *node = mul();
 
   for (;;) {
-    if (consume('+'))
-      node = new_node(ND_ADD, node, mul());
-    else if (consume('-'))
-      node = new_node(ND_SUB, node, mul());
+    if (consume("+"))
+      node = new_binary(ND_ADD, node, mul());
+    else if (consume("-"))
+      node = new_binary(ND_SUB, node, mul());
     else
       return node;
   }
 }
 
 Node *unary() {
-  if (consume('+'))
+  if (consume("+"))
     return primary();
-  if (consume('-'))
-    return new_node(ND_SUB, new_node_num(0), primary());
+  if (consume("-"))
+    return new_binary(ND_SUB, new_num(0), primary());
   return primary();
 }
 
 Node *primary() {
-  if (consume('(')) {
+  if (consume("(")) {
     Node *node = expr();
-    expect(')');
+    expect(")");
     return node;
   }
-  return new_node_num(expect_number());
+  return new_num(expect_number());
 }
 
 Node *mul() {
   Node *node = unary();
 
   for (;;) {
-    if (consume('*'))
-      node = new_node(ND_MUL, node, unary());
-    else if (consume('/'))
-      node = new_node(ND_DIV, node, unary());
+    if (consume("*"))
+      node = new_binary(ND_MUL, node, unary());
+    else if (consume("/"))
+      node = new_binary(ND_DIV, node, unary());
     else
       return node;
   }
