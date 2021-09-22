@@ -38,9 +38,14 @@ bool consume(char *op) {
 }
 
 Token *consume_ident() {
-  Token *tok = token;
-  token = token->next;
-  return tok;
+  for (char x = 'a'; x <= 'z'; x++) {
+    if (token->str[0] != x) continue;
+    Token *tok = token;
+    token = token->next;
+    return token;
+  }
+
+  return NULL;
 }
 
 void expect(char *op) {
@@ -93,7 +98,7 @@ Token *tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<>", *p)) {
+    if (strchr("+-*/()<>=;", *p)) {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -101,6 +106,11 @@ Token *tokenize() {
     if (isdigit(*p)) {
       cur = new_token(TK_NUM, cur, p, 0);
       cur->val = strtol(p, &p, 10);
+      continue;
+    }
+
+    if ('a' <= *p && *p <= 'z') {
+      cur = new_token(TK_IDENT, cur, p++, 1);
       continue;
     }
 
