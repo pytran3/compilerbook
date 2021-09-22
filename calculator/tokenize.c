@@ -37,9 +37,15 @@ bool consume(char *op) {
   return true;
 }
 
+Token *consume_ident() {
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 void expect(char *op) {
   if (!is_expect(op))
-    error_at(token->str, "'%c'ではありません", op);
+    error_at(token->str, "'%c'ではありません", op[0]);
   token = token->next;
 }
 
