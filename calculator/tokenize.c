@@ -42,7 +42,7 @@ Token *consume_ident() {
     if (token->str[0] != x) continue;
     Token *tok = token;
     token = token->next;
-    return token;
+    return tok;
   }
 
   return NULL;
