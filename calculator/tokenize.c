@@ -25,6 +25,7 @@ void error_at(char *loc, char *fmt, ...) {
 }
 
 bool is_expect(char *op) {
+#pragma GCC diagnostic ignored "-Wsign-compare"
   return !(token->kind != TK_RESERVED ||
       strlen(op) != token->len|| 
       memcmp(token->str, op, token->len));
