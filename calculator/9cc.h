@@ -66,6 +66,14 @@ struct Node {
   long offset;   // Used if kind == ND_LVAR
 };
 
+// IDENTIFIER
+typedef struct LVar LVar;
+struct LVar {
+  LVar *next;
+  char *name;
+  int len;
+  int offset;
+};
 void program(void);
 
 extern Node *code[100];

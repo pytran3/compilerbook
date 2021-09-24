@@ -38,14 +38,19 @@ bool consume(char *op) {
   return true;
 }
 
+bool is_ident_char(char c) {
+  return  'a' <= c && c <= 'z' ||
+          'A' <= c && c <= 'Z' ||
+          '0' <= c && c <= '9' ||
+          c == '_';
+}
+
 Token *consume_ident() {
-  for (char x = 'a'; x <= 'z'; x++) {
-    if (token->str[0] != x) continue;
+  if (token->kind == TK_IDENT) {
     Token *tok = token;
     token = token->next;
     return tok;
   }
-
   return NULL;
 }
 
@@ -65,6 +70,14 @@ long expect_number() {
 
 bool at_eof() {
   return token->kind == TK_EOF;
+}
+
+int len_ident(char *p) {
+  char *ret = p;
+  for(;*ret;ret++) {
+    if (!is_ident_char(*ret)) break;
+  }
+  return ret - p;
 }
 
 Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
@@ -111,7 +124,9 @@ Token *tokenize() {
     }
 
     if ('a' <= *p && *p <= 'z') {
-      cur = new_token(TK_IDENT, cur, p++, 1);
+      int len = len_ident(p);
+      cur = new_token(TK_IDENT, cur, p, len);
+      p += len;
       continue;
     }
 
