@@ -13,6 +13,7 @@ typedef enum {
   TK_RESERVED, // Keywords or punctuators
   TK_IDENT,    // Identifier
   TK_NUM,      // Integer literals
+  TK_RETURN,   // Return
   TK_EOF,      // End-of-file markers
 } TokenKind;
 
@@ -30,6 +31,7 @@ void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
 Token *consume_ident();
+bool consume_return();
 void expect(char *op);
 long expect_number(void);
 bool at_eof(void);
@@ -54,6 +56,7 @@ typedef enum {
   ND_LVAR,   // Local Identifier
   ND_NUM,    // Integer
   ND_ASSIGN, // Assignment
+  ND_RETURN, // Return
 } NodeKind;
 
 // AST node type

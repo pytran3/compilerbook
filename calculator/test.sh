@@ -48,4 +48,7 @@ assert 1 'ab=1;'
 assert 2 'ab = 1; ab = ab + 1;'
 assert 1 'abcdefghijklmnopqrstuvwxyz_ZBCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=1;'
 
+assert 1 'return 1;'
+assert 2 'return 2; 1;'
+
 echo OK

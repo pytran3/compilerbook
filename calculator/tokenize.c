@@ -39,9 +39,9 @@ bool consume(char *op) {
 }
 
 bool is_ident_char(char c) {
-  return  'a' <= c && c <= 'z' ||
-          'A' <= c && c <= 'Z' ||
-          '0' <= c && c <= '9' ||
+  return  ('a' <= c && c <= 'z') ||
+          ('A' <= c && c <= 'Z') ||
+          ('0' <= c && c <= '9') ||
           c == '_';
 }
 
@@ -52,6 +52,12 @@ Token *consume_ident() {
     return tok;
   }
   return NULL;
+}
+
+bool consume_return() {
+  if (token->kind != TK_RETURN) return false;
+  token = token->next;
+  return true;
 }
 
 void expect(char *op) {
@@ -93,7 +99,6 @@ bool startswith(char *p, char *q) {
   return memcmp(p, q, strlen(q)) == 0;
 }
 
-
 Token *tokenize() {
   char *p = user_input;
   Token head;
@@ -105,6 +110,13 @@ Token *tokenize() {
       p++;
       continue;
     }
+
+    if (strncmp(p, "return", 6) == 0 && !is_ident_char(p[6])) {
+      cur = new_token(TK_RETURN, cur, p, 6);
+      p += 6;
+      continue;
+    }
+
     if (startswith(p, "==") || startswith(p, "!=") ||
         startswith(p, "<=") || startswith(p, ">=")) {
       cur = new_token(TK_RESERVED, cur, p, 2);
