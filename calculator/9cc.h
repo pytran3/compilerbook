@@ -14,6 +14,8 @@ typedef enum {
   TK_IDENT,    // Identifier
   TK_NUM,      // Integer literals
   TK_RETURN,   // Return
+  TK_IF,       // If
+  TK_ELSE,     // Else
   TK_EOF,      // End-of-file markers
 } TokenKind;
 
@@ -32,8 +34,11 @@ void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
 Token *consume_ident();
 bool consume_return();
+bool consume_if();
+bool consume_else();
 void expect(char *op);
 long expect_number(void);
+bool is_token(TokenKind tk, int n, Token *token);
 bool at_eof(void);
 Token *tokenize(void);
 
@@ -57,6 +62,7 @@ typedef enum {
   ND_NUM,    // Integer
   ND_ASSIGN, // Assignment
   ND_RETURN, // Return
+  ND_IF,     // If
 } NodeKind;
 
 // AST node type
@@ -67,6 +73,10 @@ struct Node {
   Node *rhs;     // Right-hand side
   long val;      // Used if kind == ND_NUM
   long offset;   // Used if kind == ND_LVAR
+  // If Statement
+  Node *cond;    // Condition
+  Node *then;    // Then
+  Node *els;     // Else
 };
 
 // IDENTIFIER

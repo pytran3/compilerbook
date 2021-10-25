@@ -51,4 +51,9 @@ assert 1 'abcdefghijklmnopqrstuvwxyz_ZBCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=1;'
 assert 1 'return 1;'
 assert 2 'return 2; 1;'
 
+assert 2 'if(0) return 3; 2;'
+assert 3 'if(1) return 3; 2;'
+assert 1 'a=0; if(1) a=1; a;'
+assert 2 'if(0) return 3; else 2;'
+
 echo OK

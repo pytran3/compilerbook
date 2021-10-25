@@ -60,10 +60,30 @@ bool consume_return() {
   return true;
 }
 
+bool consume_if() {
+  if (token->kind != TK_IF) return false;
+  token = token->next;
+  return true;
+}
+
+bool consume_else() {
+  if (token->kind != TK_ELSE) return false;
+  token = token->next;
+  return true;
+}
+
 void expect(char *op) {
   if (!is_expect(op))
     error_at(token->str, "'%c'ではありません", op[0]);
   token = token->next;
+}
+
+bool is_token(TokenKind tk, int n, Token *token) {
+  if(n > 0) {
+      if (token->next == NULL) return false;
+      return is_token(tk, n-1, token->next);
+  }
+  return token->kind == tk;
 }
 
 long expect_number() {
@@ -99,6 +119,11 @@ bool startswith(char *p, char *q) {
   return memcmp(p, q, strlen(q)) == 0;
 }
 
+bool is_reserved_word(char *p, char *word) {
+  int len = strlen(word);
+  return strncmp(p, word, len) == 0 && !is_ident_char(p[len]);
+}
+
 Token *tokenize() {
   char *p = user_input;
   Token head;
@@ -111,9 +136,19 @@ Token *tokenize() {
       continue;
     }
 
-    if (strncmp(p, "return", 6) == 0 && !is_ident_char(p[6])) {
+    if (is_reserved_word(p, "return")) {
       cur = new_token(TK_RETURN, cur, p, 6);
       p += 6;
+      continue;
+    }
+    if (is_reserved_word(p, "if")) {
+      cur = new_token(TK_IF, cur, p, 2);
+      p += 2;
+      continue;
+    }
+    if (is_reserved_word(p, "else")) {
+      cur = new_token(TK_ELSE, cur, p, 4);
+      p += 4;
       continue;
     }
 
@@ -123,7 +158,6 @@ Token *tokenize() {
       p += 2;
       continue;
     }
-
     if (strchr("+-*/()<>=;", *p)) {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
