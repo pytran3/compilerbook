@@ -1,5 +1,6 @@
 #include "9cc.h"
 
+int label_id = 0;
 
 void gen_lval(Node *node) {
   if (node->kind != ND_LVAR) {
@@ -12,6 +13,7 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
+  int l1, l2, l3;
   switch (node->kind) {
   case ND_NUM:
     printf("  push %ld\n", node->val);
@@ -39,17 +41,20 @@ void gen(Node *node) {
     printf("  ret\n");
     return;
   case ND_IF:
+    l1 = label_id++;
+    l2 = label_id++;
+    l3 = label_id++;
     gen(node->cond);
     printf("  pop rax\n");
     printf("  test rax, rax\n");
-    printf("  jne .L%d\n", 0);
-    printf("  jmp .L%d\n", 1);
-    printf(".L%d:\n", 0);
+    printf("  jne .L%d\n", l1);
+    printf("  jmp .L%d\n", l2);
+    printf(".L%d:\n", l1);
     gen(node->then);
-    printf("  jmp .L%d\n", 2);
-    printf(".L%d:\n", 1);
+    printf("  jmp .L%d\n", l3);
+    printf(".L%d:\n", l2);
     if (node->els != NULL) gen(node->els);
-    printf(".L%d:\n", 2);
+    printf(".L%d:\n", l3);
     return;
   default:
     break;
