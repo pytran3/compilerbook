@@ -56,6 +56,18 @@ void gen(Node *node) {
     if (node->els != NULL) gen(node->els);
     printf(".L%d:\n", l3);
     return;
+  case ND_WHILE:
+    l1 = label_id++;
+    l2 = label_id++;
+    printf(".L%d:\n", l1);
+    gen(node->cond);
+    printf("  pop rax\n");
+    printf("  test rax, rax\n");
+    printf("  je .L%d\n", l2);
+    gen(node->then);
+    printf("  jmp .L%d\n", l1);
+    printf(".L%d:\n", l2);
+    return;
   default:
     break;
   }

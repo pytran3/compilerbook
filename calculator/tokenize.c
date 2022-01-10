@@ -72,6 +72,12 @@ bool consume_else() {
   return true;
 }
 
+bool consume_while() {
+  if (token->kind != TK_WHILE) return false;
+  token = token->next;
+  return true;
+}
+
 void expect(char *op) {
   if (!is_expect(op))
     error_at(token->str, "'%c'ではありません", op[0]);
@@ -149,6 +155,11 @@ Token *tokenize() {
     if (is_reserved_word(p, "else")) {
       cur = new_token(TK_ELSE, cur, p, 4);
       p += 4;
+      continue;
+    }
+    if (is_reserved_word(p, "while")) {
+      cur = new_token(TK_WHILE, cur, p, 5);
+      p += 5;
       continue;
     }
 

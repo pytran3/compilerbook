@@ -56,5 +56,10 @@ assert 3 'if(1) return 3; 2;'
 assert 1 'a=0; if(1) a=1; a;'
 assert 2 'if(0) return 3; else 2;'
 assert 21 'if(0) a=10; else a=20; if(1) a = a + 1; else a = a - 1; return a;'
+assert 3 'if(0) a=1; else if(0) a=2; else a=3; return a;'
+assert 1 'if(1) a=1; else if(0) a=2; else a=3; return a;'
+assert 1 'if 1 1;'
+
+assert 0 'a = 10; while(a) a = a - 1; return a;'
 
 echo OK

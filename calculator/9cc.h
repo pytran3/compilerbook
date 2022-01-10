@@ -16,6 +16,7 @@ typedef enum {
   TK_RETURN,   // Return
   TK_IF,       // If
   TK_ELSE,     // Else
+  TK_WHILE,    // While
   TK_EOF,      // End-of-file markers
 } TokenKind;
 
@@ -36,6 +37,7 @@ Token *consume_ident();
 bool consume_return();
 bool consume_if();
 bool consume_else();
+bool consume_while();
 void expect(char *op);
 long expect_number(void);
 bool is_token(TokenKind tk, int n, Token *token);
@@ -63,6 +65,7 @@ typedef enum {
   ND_ASSIGN, // Assignment
   ND_RETURN, // Return
   ND_IF,     // If
+  ND_WHILE,  // While
 } NodeKind;
 
 // AST node type
