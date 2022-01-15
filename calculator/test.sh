@@ -62,4 +62,9 @@ assert 1 'if 1 1;'
 
 assert 0 'a = 10; while(a) a = a - 1; return a;'
 
+assert 5 'a = 10; b = 5; while(b) {a = a - 1;b = b - 1;} return a;'
+assert 2 'if(1) {1; return 2;} 3;'
+
+
+
 echo OK

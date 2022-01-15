@@ -80,6 +80,16 @@ bool consume_while() {
   return true;
 }
 
+bool consume_block_begin() {
+  if (consume("{")) return true;
+  return false;
+}
+
+bool consume_block_end() {
+  if (consume("}")) return true;
+  return false;
+}
+
 void expect(char *op) {
   if (!is_expect(op))
     error_at(token->str, "'%c'ではありません", op[0]);
@@ -171,7 +181,7 @@ Token *tokenize() {
       p += 2;
       continue;
     }
-    if (strchr("+-*/()<>=;", *p)) {
+    if (strchr("+-*/()<>=;{}", *p)) {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }

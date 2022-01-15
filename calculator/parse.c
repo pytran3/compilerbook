@@ -73,6 +73,21 @@ Node *stmt() {
     node->cond = expr();
     node->then = stmt();
   }
+  else if (consume_block_begin()) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK_BEGIN;
+    Node *head = node;
+    while (!consume_block_end()) {
+      Node *new_node = calloc(1, sizeof(Node));
+      new_node->kind = ND_BLOCK;
+      head->next = new_node;
+      new_node->stmt = stmt();
+      head = new_node;
+    }
+    Node *end_node = calloc(1, sizeof(Node));
+    end_node->kind = ND_BLOCK_END;
+    head->next = end_node;
+  }
   else {
     node = expr();
     expect(";");

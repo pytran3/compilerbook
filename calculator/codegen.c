@@ -68,6 +68,14 @@ void gen(Node *node) {
     printf("  jmp .L%d\n", l1);
     printf(".L%d:\n", l2);
     return;
+  case ND_BLOCK_BEGIN:
+    node = node->next;
+    while(node->kind == ND_BLOCK) {
+      gen(node->stmt);
+      if(node->next->kind != ND_BLOCK_END) printf("  pop rax\n");
+      node = node->next;
+    }
+    return;
   default:
     break;
   }

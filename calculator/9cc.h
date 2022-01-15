@@ -38,6 +38,8 @@ bool consume_return();
 bool consume_if();
 bool consume_else();
 bool consume_while();
+bool consume_block_begin();
+bool consume_block_end();
 void expect(char *op);
 long expect_number(void);
 bool is_token(TokenKind tk, int n, Token *token);
@@ -52,20 +54,23 @@ extern Token *token;
 //
 
 typedef enum {
-  ND_ADD,    // +
-  ND_SUB,    // -
-  ND_MUL,    // *
-  ND_DIV,    // /
-  ND_EQ,     // ==
-  ND_NE,     // !=
-  ND_LT,     // <
-  ND_LE,     // <=
-  ND_LVAR,   // Local Identifier
-  ND_NUM,    // Integer
-  ND_ASSIGN, // Assignment
-  ND_RETURN, // Return
-  ND_IF,     // If
-  ND_WHILE,  // While
+  ND_ADD,         // +
+  ND_SUB,         // -
+  ND_MUL,         // *
+  ND_DIV,         // /
+  ND_EQ,          // ==
+  ND_NE,          // !=
+  ND_LT,          // <
+  ND_LE,          // <=
+  ND_LVAR,        // Local Identifier
+  ND_NUM,         // Integer
+  ND_ASSIGN,      // Assignment
+  ND_RETURN,      // Return
+  ND_IF,          // If
+  ND_WHILE,       // While
+  ND_BLOCK_BEGIN, // {
+  ND_BLOCK,       // stmt
+  ND_BLOCK_END    // }
 } NodeKind;
 
 // AST node type
@@ -76,10 +81,13 @@ struct Node {
   Node *rhs;     // Right-hand side
   long val;      // Used if kind == ND_NUM
   long offset;   // Used if kind == ND_LVAR
-  // If Statement
+  // If statement
   Node *cond;    // Condition
   Node *then;    // Then
   Node *els;     // Else
+  // Block statement
+  Node *stmt;
+  Node *next;
 };
 
 // IDENTIFIER
