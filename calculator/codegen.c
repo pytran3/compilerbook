@@ -13,37 +13,38 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
-  int l1, l2, l3;
-  switch (node->kind) {
-  case ND_NUM:
+  if (node->kind == ND_NUM) {
     printf("  push %ld\n", node->val);
     return;
-  case ND_LVAR:
+  }
+  if (node->kind == ND_LVAR) {
     gen_lval(node);
     printf("  pop rax\n");
     printf("  mov rax, [rax]\n");
     printf("  push rax\n");
     return;
-  case ND_ASSIGN:
+  }
+  if (node->kind == ND_ASSIGN) {
     gen_lval(node->lhs);
     gen(node->rhs);
-
     printf("  pop rdi\n");
     printf("  pop rax\n");
     printf("  mov [rax], rdi\n");
     printf("  push rdi\n");
     return;
-  case ND_RETURN:
+  }
+  if (node->kind == ND_RETURN) {
     gen(node->lhs);
     printf("  pop rax\n");
     printf("  mov rsp, rbp\n");
     printf("  pop rbp\n");
     printf("  ret\n");
-    return;
-  case ND_IF:
-    l1 = label_id++;
-    l2 = label_id++;
-    l3 = label_id++;
+    return;    
+  }
+  if (node->kind == ND_IF) {
+    int l1 = label_id++;
+    int l2 = label_id++;
+    int l3 = label_id++;
     gen(node->cond);
     printf("  pop rax\n");
     printf("  test rax, rax\n");
@@ -56,9 +57,10 @@ void gen(Node *node) {
     if (node->els != NULL) gen(node->els);
     printf(".L%d:\n", l3);
     return;
-  case ND_WHILE:
-    l1 = label_id++;
-    l2 = label_id++;
+  }
+  if (node->kind == ND_WHILE) {
+    int l1 = label_id++;
+    int l2 = label_id++;
     printf(".L%d:\n", l1);
     gen(node->cond);
     printf("  pop rax\n");
@@ -68,7 +70,8 @@ void gen(Node *node) {
     printf("  jmp .L%d\n", l1);
     printf(".L%d:\n", l2);
     return;
-  case ND_BLOCK_BEGIN:
+  }
+  if (node->kind == ND_BLOCK_BEGIN) {
     node = node->next;
     while(node->kind == ND_BLOCK) {
       gen(node->stmt);
@@ -76,53 +79,48 @@ void gen(Node *node) {
       node = node->next;
     }
     return;
-  default:
-    break;
   }
 
   gen(node->lhs);
   gen(node->rhs);
-
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  switch (node->kind) {
-  case ND_ADD:
+  if (node->kind == ND_ADD) {
     printf("  add rax, rdi\n");
-    break;
-  case ND_SUB:
+  }
+  else if (node->kind == ND_SUB) {
     printf("  sub rax, rdi\n");
-    break;
-  case ND_MUL:
-    printf("  imul rax, rdi\n");
-    break;
-  case ND_DIV:
+  }
+  else if (node->kind == ND_MUL) {
+    printf("  imul rax, rdi\n");    
+  }
+  else if (node->kind == ND_DIV) {
     printf("  cqo\n");
     printf("  idiv rdi\n");
-    break;
-  case ND_EQ:
+  }
+  else if (node->kind == ND_EQ) {
     printf("  cmp rax, rdi\n");
     printf("  sete al\n");
     printf("  movzb rax, al\n");
-    break;
-  case ND_NE:
+  }
+  else if (node->kind == ND_NE) {
     printf("  cmp rax, rdi\n");
     printf("  setne al\n");
     printf("  movzb rax, al\n");
-    break;
-  case ND_LT:
+  }
+  else if (node->kind == ND_LT) {
     printf("  cmp rax, rdi\n");
     printf("  setl al\n");
     printf("  movzb rax, al\n");
-    break;
-  case ND_LE:
+  }
+  else if (node->kind == ND_LE) {
     printf("  cmp rax, rdi\n");
     printf("  setle al\n");
-    printf("  movzb rax, al\n");
-    break;
-  default:
+    printf("  movzb rax, al\n");    
+  }
+  else {
     error("予期しないトークンが来ました\n");
-    break;
   }
 
   printf("  push rax\n");
