@@ -70,7 +70,8 @@ typedef enum {
   ND_WHILE,       // While
   ND_BLOCK_BEGIN, // {
   ND_BLOCK,       // stmt
-  ND_BLOCK_END    // }
+  ND_BLOCK_END,   // }
+  ND_FUNCTION     // Call function 
 } NodeKind;
 
 // AST node type
@@ -94,6 +95,13 @@ struct Node {
 typedef struct LVar LVar;
 struct LVar {
   LVar *next;
+  char *name;
+  int len;
+  int offset;
+};
+typedef struct Function Function;
+struct Function {
+  Function *next;
   char *name;
   int len;
   int offset;

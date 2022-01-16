@@ -2,6 +2,7 @@
 
 Node *code[100];
 LVar *locals;
+Function *functions;
 
 Node *new_node(NodeKind kind) {
   Node *node = calloc(1, sizeof(Node));
@@ -24,6 +25,15 @@ Node *new_num(int val) {
 
 LVar *find_lvar(Token *tok) {
   for (LVar *var = locals; var; var = var->next) {
+    if(var->len == tok->len && !memcmp(tok->str, var->name, var->len)) {
+      return var;
+    }
+  }
+  return NULL;
+}
+
+Function *find_function(Token *tok) {
+  for (Function *var = functions; var; var = var->next) {
     if(var->len == tok->len && !memcmp(tok->str, var->name, var->len)) {
       return var;
     }
@@ -180,6 +190,25 @@ Node *primary() {
   
   Token *tok = consume_ident();
   if (tok) {
+    if (consume("(")) {
+      Node *node = calloc(1, sizeof(Node));
+      node->kind = ND_FUNCTION;
+      Function *function = find_function(tok);
+      if(function) {
+        node->offset = function->offset;
+      }
+      else {
+        function = calloc(1, sizeof(LVar));
+        function->next = locals;
+        function->name = tok->str;
+        function->len = tok->len;
+        function->offset = locals? locals->offset + 8: 0;
+        node->offset = function->offset;
+        locals = function;
+      }
+      expect(")");
+      return node;
+    }
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
     LVar *lvar = find_lvar(tok);
