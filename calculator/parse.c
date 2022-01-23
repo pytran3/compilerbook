@@ -193,24 +193,28 @@ Node *primary() {
     if (consume("(")) {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_FUNCTION;
+      node->name = tok->str;
+      node->len = tok->len;
       Function *function = find_function(tok);
       if(function) {
         node->offset = function->offset;
       }
       else {
-        function = calloc(1, sizeof(LVar));
-        function->next = locals;
+        function = calloc(1, sizeof(Function));
+        function->next = functions;
         function->name = tok->str;
         function->len = tok->len;
-        function->offset = locals? locals->offset + 8: 0;
+        function->offset = functions? functions->offset + 8: 0;
         node->offset = function->offset;
-        locals = function;
+        functions = function;
       }
       expect(")");
       return node;
     }
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
+    node->name = tok->str;
+    node->len = tok->len;
     LVar *lvar = find_lvar(tok);
     if (lvar) {
       node->offset = lvar->offset;

@@ -89,6 +89,9 @@ struct Node {
   // Block statement
   Node *stmt;
   Node *next;
+  // Identifier
+  char *name;
+  int len;
 };
 
 // IDENTIFIER

@@ -80,6 +80,10 @@ void gen(Node *node) {
     }
     return;
   }
+  if (node->kind == ND_FUNCTION) {
+    printf("  call %.*s\n", node->len, node->name);
+    return;
+  }
 
   gen(node->lhs);
   gen(node->rhs);
