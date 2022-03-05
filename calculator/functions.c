@@ -1,6 +1,6 @@
 #include<stdio.h>
 
-int foo() {
+int return_1() {
     printf("hello\n");
-    return 0;
+    return 1;
 }

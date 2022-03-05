@@ -82,6 +82,7 @@ void gen(Node *node) {
   }
   if (node->kind == ND_FUNCTION) {
     printf("  call %.*s\n", node->len, node->name);
+    printf("  push rax\n");
     return;
   }
 
